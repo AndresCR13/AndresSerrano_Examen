@@ -23,20 +23,61 @@ namespace AndresSerrano_Examen
                 Console.WriteLine("Ingrese la información del nuevo libro:");
                 Console.Write("Código: ");
                 int codigo = int.Parse(Console.ReadLine());
+                string titulo = "";
 
-                Console.Write("Título: ");
-                string titulo = Console.ReadLine();
 
-                Console.Write("Autor: ");
-                string autor = Console.ReadLine();
+                while (true)
+                {
+                    Console.Write("Título: ");
+                    titulo = Console.ReadLine();
 
-                Console.Write("Fecha de Publicación (YYYY-MM-DD): ");
+                    if (int.TryParse(titulo, out _))
+                    {
+                        // Si se ingresa un número, muestra un mensaje de error.
+                        Console.WriteLine("Error: El título no puede ser un número. Intenta nuevamente.");
+                    }
+                    else if (string.IsNullOrWhiteSpace(titulo))
+                    {
+                        // Si se deja el espacio en blanco, muestra un mensaje de error.
+                        Console.WriteLine("Error: El título no puede estar en blanco. Intenta nuevamente.");
+                    }
+                    else
+                    {
+                        // Si la entrada es válida, sale del bucle.
+                        break;
+                    }
+                }
+
+                
+                string autor = "";
+                while (true)
+                {
+                    Console.Write("Autor: ");
+                    autor = Console.ReadLine();
+
+                    if (int.TryParse(autor, out _))
+                    {
+                        // Si se ingresa un número, muestra un mensaje de error.
+                        Console.WriteLine("Error: El título no puede ser un número. Intenta nuevamente.");
+                    }
+                    else if (string.IsNullOrWhiteSpace(autor))
+                    {
+                        // Si se deja el espacio en blanco, muestra un mensaje de error.
+                        Console.WriteLine("Error: El título no puede estar en blanco. Intenta nuevamente.");
+                    }
+                    else
+                    {
+                        // Si la entrada es válida, sale del bucle.
+                        break;
+                    }
+                }
+                Console.Write("Fecha de Publicación (Año-Mes-Dia): ");
                 DateTime fechaPublicacion = DateTime.Parse(Console.ReadLine());
 
                 Console.Write("Precio: ");
                 double precio = double.Parse(Console.ReadLine());
 
-                Console.Write("¿El libor se encuentra Disponible? (s/n): ");
+                Console.Write("¿El libor se encuentra Disponible? (true/false): ");
                 bool disponible = bool.Parse(Console.ReadLine());
                 Console.Write("Desea agregar otro producto? (s/n):");
                 string n = Console.ReadLine();
@@ -111,11 +152,11 @@ namespace AndresSerrano_Examen
 
                         case 4: BuscarLibros(); break;
 
-                        case 5: Console.WriteLine("opcion 5..."); break;
+                        case 5: MayorPrecio(); break;
 
-                        case 6:;  Console.WriteLine("opcion 6...");break;
+                        case 6:; LibrosBaratos(); break;
 
-                        case 7: Console.WriteLine("opcion 7..."); break;
+                        case 7: BuscarAutor(); break;
 
                         case 8:Console.WriteLine("Saliendo..."); break;
 
@@ -132,15 +173,21 @@ namespace AndresSerrano_Examen
             static void BuscarLibros()
             {
                 int cod = 0;
-                Boolean existe = false;
-                Console.WriteLine("Digite el código del producto que desea buscar");
+                bool existe = false;
+
+                Console.WriteLine("Digite el código del libro que desea buscar:");
                 cod = Convert.ToInt32(Console.ReadLine());
 
-                for (int i = 0; i < listaLibros.Count; i++)
+                foreach (var libro in listaLibros)
                 {
-                    if (cod == listaLibros[i].Codigo)
+                    if (cod == libro.Codigo)
                     {
-                        Console.WriteLine("Informacion del libro ");
+                        Console.WriteLine($"Información del libro con código {cod}:");
+                        Console.WriteLine($"- Título: {libro.Titulo}");
+                        Console.WriteLine($"- Autor: {libro.Autor}");
+                        Console.WriteLine($"- Fecha de Publicación: {libro.FechaPublicacion.ToShortDateString()}");
+                        Console.WriteLine($"- Precio: ${libro.Precio}");
+                        Console.WriteLine($"- Disponible: {(libro.Disponible ? "Sí" : "No")}");
 
                         existe = true;
                         break;
@@ -148,10 +195,77 @@ namespace AndresSerrano_Examen
                     if (!existe)
                     {
                         Console.Clear();
-                        Console.WriteLine("El libro no existe");
+                        Console.WriteLine("El libro no existe en la biblioteca.");
                     }
+                } 
+            }
+            static void MayorPrecio()
+            {
+                if (listaLibros.Count > 0)
+                {
+                    var libroMasCaro = listaLibros.OrderByDescending(libro => libro.Precio).First();
+
+                    Console.WriteLine($"Libro más caro:");
+                    Console.WriteLine($"- Título: {libroMasCaro.Titulo}");
+                    Console.WriteLine($"- Autor: {libroMasCaro.Autor}");
+                    Console.WriteLine($"- Fecha de Publicación: {libroMasCaro.FechaPublicacion.ToShortDateString()}");
+                    Console.WriteLine($"- Precio: ${libroMasCaro.Precio}");
+                    Console.WriteLine($"- Disponible: {(libroMasCaro.Disponible ? "Sí" : "No")}");
+                }
+                else
+                {
+                    Console.WriteLine("La biblioteca está vacía. No hay libros disponibles.");
                 }
             }
-    }              
+            static void LibrosBaratos()
+            {
+                if (listaLibros.Count > 0)
+                {
+                    var tresLibrosMasBaratos = listaLibros.OrderBy(libro => libro.Precio).Take(3).ToList();
+
+                    Console.WriteLine("Los tres libros más baratos son:");
+                    foreach (var libro in tresLibrosMasBaratos)
+                    {
+                        Console.WriteLine($"- Título: {libro.Titulo}");
+                        Console.WriteLine($"- Autor: {libro.Autor}");
+                        Console.WriteLine($"- Precio: ${libro.Precio}");
+                        Console.WriteLine($"- Disponible: {(libro.Disponible ? "Sí" : "No")}");
+                        Console.WriteLine();
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("La biblioteca está vacía. No hay libros disponibles.");
+                }
+            }
+            static void BuscarAutor()
+            {
+                Console.WriteLine("Ingrese el inicio del nombre del autor que desea buscar:");
+                string inicioAutor = Console.ReadLine();
+
+                bool resultado = false;
+
+                Console.WriteLine($"Resultados de la búsqueda para autores de nombre '{inicioAutor}':");
+                foreach (var libro in listaLibros)
+                {
+                    if (libro.Autor.StartsWith(inicioAutor, StringComparison.OrdinalIgnoreCase))
+                    {
+                        resultado = true;
+
+                        Console.WriteLine(libro.Titulo);
+                        Console.WriteLine($"- Autor: {libro.Autor}");
+                        Console.WriteLine($"- Fecha de Publicación: {libro.FechaPublicacion.ToShortDateString()}");
+                        Console.WriteLine($"- Precio: ${libro.Precio}");
+                        Console.WriteLine($"- Disponible: {(libro.Disponible ? "Sí" : "No")}");
+                        Console.WriteLine();
+                    }
+                }
+
+                if (!resultado)
+                {
+                    Console.WriteLine($"No se encontraron libros con autores de nombre '{inicioAutor}'.");
+                }
+            }
+        }              
     }
 }
